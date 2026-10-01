@@ -1,0 +1,12 @@
+build/
+__pycache__
+docs/_build/
+vivado*.jou
+vivado*.log
+.Xil/
+
+# pytorch-Toolchain: generierte/heruntergeladene Daten nicht pushen
+pytorch/data/
+pytorch/vectors/
+pytorch/*.mem
+pytorch/image7.h

@@ -1,0 +1,63 @@
+// SPDX-License-Identifier: SHL-2.1
+// SPDX-FileCopyrightText: 2024 RVLab Contributors
+
+{
+    name: "main"
+    type: "xbar"
+    clock: "clk_main_i"
+    reset: "rst_main_ni"
+    clock_connections: {clk_main_i: "clk_main"}
+    reset_connections: {rst_main_ni: "rst_main"}
+    nodes: [
+        {
+            name: "corei"
+            type: "host"
+            pipeline: "false"
+        }
+        {
+            name: "cored"
+            type: "host"
+            pipeline: "false"
+        }
+        { 
+            name: "dbgsba"
+            type: "host"
+            pipeline: "true"
+        }
+        {
+            name: "student_host"
+            type: "host"
+            pipeline:  "true"
+        }
+        {
+            name: "bram_main"
+            type: "device"
+            pipeline: "false"
+            addr_range: [{base_addr: "0x00000000", size_byte: "0x00040000"}]
+        }
+        {
+            name: "ddr"
+            type: "device"
+            pipeline: "false"
+            addr_range: [{base_addr: "0x80000000", size_byte: "0x20000000"}]
+        }
+        {
+            name: "peri"
+            type: "device"
+            pipeline: "true"
+            addr_range: [{base_addr: "0x10000000", size_byte: "0x10000000"}]
+        }
+        {
+            name: "student_device_fast"
+            type: "device"
+            pipeline: "false"
+            addr_range: [{base_addr: "0x20000000", size_byte: "0x10000000"}]
+        }
+    ]
+    connections: {
+        corei:        ["bram_main", "peri", "ddr", "student_device_fast"]
+        cored:        ["bram_main", "peri", "ddr", "student_device_fast"]
+        dbgsba:       ["bram_main", "peri", "ddr", "student_device_fast"]
+        student_host: ["bram_main", "peri", "ddr", "student_device_fast"]
+    }
+}

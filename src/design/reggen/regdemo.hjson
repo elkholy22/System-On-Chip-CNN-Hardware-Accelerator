@@ -1,0 +1,41 @@
+// SPDX-License-Identifier: SHL-2.1
+// SPDX-FileCopyrightText: 2024 RVLab Contributors
+
+{
+  name: "regdemo"
+  clock_primary: "sys_clk"
+  bus_device: "tlul"
+  regwidth: "32"
+  registers: [
+    {
+      name: "shiftout"
+      desc: "shifter output"
+      swaccess: "ro"
+      hwaccess: "hwo"
+      hwext: "true"
+      fields: [
+        {bits: "31:0", name: "val", desc: "value"}
+      ]
+    }
+    {
+      name: "shiftin"
+      desc: "Shifter input"
+      swaccess: "rw"
+      hwaccess: "hro"
+      fields: [
+        {bits: "31:0", name: "val", desc: "value"}
+      ]
+    }
+    {
+      name: "shiftcfg"
+      desc: "Shifter config"
+      swaccess: "rw"
+      hwaccess: "hro"
+      fields:
+      [
+        {bits: "5:1", name: "amt", desc: "shift amount"}
+        {bits: "0", name: "dir", desc: "direction: 0 = left, 1 = right"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+// SPDX-License-Identifier: SHL-2.1
+// SPDX-FileCopyrightText: 2024 RVLab Contributors
+
+{
+  name: "student_rlight"
+  clock_primary: sys_clk
+  bus_device: tlul
+  bus_host: none
+  available_input_list: []
+  available_output_list: []
+  regwidth: "32"
+  registers:
+  [
+    {
+      name: pattern
+      desc: "LED-Muster (Quelle der Wahrheit, von SW gesetzt)"
+      swaccess: rw
+      hwaccess: hro
+      fields:
+      [
+        { bits: "7:0", name: "val", desc: "8-Bit LED-Muster" }
+      ]
+    }
+    {
+      name: mode
+      desc: "Betriebsmodus"
+      swaccess: rw
+      hwaccess: hro
+      fields:
+      [
+        { bits: "1:0", name: "val", desc: "0=right, 1=left, 2=pingpong, 3=stop" }
+      ]
+    }
+    {
+      name: speed
+      desc: "Pausenlaenge N in Taktzyklen pro Schiebeschritt"
+      swaccess: rw
+      hwaccess: hro
+      fields:
+      [
+        { bits: "31:0", name: "val", desc: "" }
+      ]
+    }
+    {
+      name: status
+      desc: "Aktuell leuchtende LEDs (read-only, von HW getrieben)"
+      swaccess: ro
+      hwaccess: hwo
+      hwext: "true"
+      fields:
+      [
+        { bits: "7:0", name: "leds", desc: "" }
+      ]
+    }
+  ]
+}

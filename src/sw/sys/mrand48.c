@@ -1,0 +1,15 @@
+/* SPDX-License-Identifier: LicenseRef-Baselibc
+ * SPDX-FileCopyrightText: 2012 Petteri Aimonen <jpa at blc.mail.kapsi.fi>
+ *
+ * mrand48.c
+ */
+
+#include <stdlib.h>
+#include <stdint.h>
+
+extern unsigned short __rand48_seed[3];	/* Common with lrand48.c, srand48.c */
+
+long mrand48(void)
+{
+	return jrand48(__rand48_seed);
+}

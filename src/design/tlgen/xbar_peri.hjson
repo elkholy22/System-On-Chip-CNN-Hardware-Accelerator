@@ -1,0 +1,46 @@
+// SPDX-License-Identifier: SHL-2.1
+// SPDX-FileCopyrightText: 2024 RVLab Contributors
+
+{
+    name: "peri"
+    type: "xbar"
+    clock: "clk_main_i"
+    reset: "rst_main_ni"
+    clock_connections: {clk_main_i: "clk_main"}
+    reset_connections: {rst_main_ni: "rst_main"}
+    nodes: [
+        {
+            name: "main"
+            type: "host"
+            pipeline: "false"
+        }
+        {
+            name: "dbgmem"
+            type: "device"
+            addr_range: [{base_addr: "0x1e000000", size_byte: "0x00001000"}]
+        }
+        {
+            name: "timer"
+            type: "device"
+            addr_range: [{base_addr: "0x1f000000", size_byte: "0x00001000"}]
+        }
+        {
+            name: "ddr_ctrl"
+            type: "device"
+            addr_range: [{base_addr: "0x1f001000", size_byte: "0x00001000"}]
+        }
+        {
+            name: "regdemo"
+            type: "device"
+            addr_range: [{base_addr: "0x1f002000", size_byte: "0x00001000"}]
+        }
+        {
+            name: "student_device_peri"
+            type: "device"
+            addr_range: [{base_addr: "0x10000000", size_byte: "0x01000000"}]
+        }
+    ]
+    connections: {
+        main:  ["dbgmem", "timer", "ddr_ctrl", "regdemo", "student_device_peri"]
+    },
+}

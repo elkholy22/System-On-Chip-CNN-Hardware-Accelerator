@@ -1,0 +1,58 @@
+{
+    name: "student_uart"
+    clock_primary: "sys_clk"
+    bus_device: "tlul"
+    regwidth: "32"
+    registers: [
+        {
+            // Einzel-Feld OHNE Namen -> reggen kollabiert: reg2hw.txdata.q/.qe
+            // hwqe -> .qe-Puls beim SW-Schreiben (= tx_start)
+            name: "txdata"
+            desc: "TX Data Output"
+            swaccess: "wo"
+            hwaccess: "hro"
+            hwqe: "true"
+            fields: [
+                { bits: "7:0", desc: "Byte to transmit" }
+            ]
+        }
+        {
+            // hwext -> Wert kommt kombinatorisch aus der HW (hw2reg.rxdata.d),
+            // hwre -> .re-Puls beim SW-Lesen (= rx_clear).
+            // hwaccess MUSS hrw sein: nur dann existiert reg2hw.rxdata (mit .re) --
+            // mit hwo referenziert der generierte reg_top ein nicht-existentes Feld.
+            name: "rxdata"
+            desc: "RX Data Input"
+            swaccess: "ro"
+            hwaccess: "hrw"
+            hwext: "true"
+            hwre: "true"
+            fields: [
+                { bits: "7:0", desc: "Last byte received" }
+            ]
+        }
+        {
+            // hwext -> Status kombinatorisch aus der HW (hw2reg.status.*.d),
+            // kein Speicher-FF noetig
+            name: "status"
+            desc: "Status Register"
+            swaccess: "ro"
+            hwaccess: "hwo"
+            hwext: "true"
+            fields: [
+                { bits: "0", name: "tx_busy",  desc: "1 = transmitter busy sending a byte" }
+                { bits: "1", name: "rx_valid", desc: "1 = unread byte available in RXDATA" }
+            ]
+        }
+        {
+            name: "ctrl"
+            desc: "Control Register"
+            swaccess: "rw"
+            hwaccess: "hro"
+            fields: [
+                { bits: "0",     name: "enable",   desc: "1 = enable UART TX/RX" }
+                { bits: "31:16", name: "baud_div", desc: "Bit period in clk cycles minus 1 (program clk_hz/baud - 1)" }
+            ]
+        }
+    ]
+}

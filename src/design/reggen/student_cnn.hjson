@@ -1,0 +1,127 @@
+// SPDX-License-Identifier: SHL-2.1
+// SPDX-FileCopyrightText: 2024 RVLab Contributors
+//
+// Registermap des CNN-Beschleunigers (per reggen generiert).
+// Reihenfolge = Offsets: ctrl 0x0, status 0x4, result 0x8, pixel 0xC,
+// cycle_count 0x10 -- kompatibel zur bisherigen (handverdrahteten) Map.
+
+{
+  name: "student_cnn"
+  clock_primary: sys_clk
+  bus_device: tlul
+  bus_host: none
+  regwidth: "32"
+  registers:
+  [
+    {
+      // hwqe -> qe-Puls beim SW-Schreiben; start/clear wirken als Ein-Takt-Pulse
+      name: ctrl
+      desc: "Control. Writing start=1 triggers one inference; clear=1 resets the pixel write pointer."
+      swaccess: wo
+      hwaccess: hro
+      hwqe: "true"
+      fields:
+      [
+        { bits: "0", name: "start", desc: "1 = start inference (one-cycle pulse via qe)" }
+        { bits: "1", name: "clear", desc: "1 = reset pixel write pointer (before loading a new image)" }
+      ]
+    }
+    {
+      // hwext -> Status kombinatorisch aus der HW (hw2reg.status.*.d)
+      name: status
+      desc: "Status. HW writes, SW reads."
+      swaccess: ro
+      hwaccess: hwo
+      hwext: "true"
+      fields:
+      [
+        { bits: "0", name: "busy", desc: "1 = inference in progress" }
+        { bits: "1", name: "done", desc: "1 = inference finished, result valid (held until next start)" }
+      ]
+    }
+    {
+      // Einzel-Feld ohne Namen -> kollabiert zu hw2reg.result.d
+      name: result
+      desc: "Predicted digit (argmax output). Valid when status.done = 1."
+      swaccess: ro
+      hwaccess: hwo
+      hwext: "true"
+      fields:
+      [
+        { bits: "3:0", desc: "Predicted class 0-9" }
+      ]
+    }
+    {
+      // Einzel-Feld ohne Namen -> reg2hw.pixel.q/.qe; jedes SW-Schreiben legt
+      // 1 Pixel ab (auto-inkrementierender Zeiger in der HW)
+      name: pixel
+      desc: "Image write port: each write stores one pixel (auto-incrementing pointer, 784 pixels)."
+      swaccess: wo
+      hwaccess: hro
+      hwqe: "true"
+      fields:
+      [
+        { bits: "7:0", desc: "Quantized int8 pixel value" }
+      ]
+    }
+    {
+      name: cycle_count
+      desc: "Clock cycles of the last inference. Valid when status.done = 1."
+      swaccess: ro
+      hwaccess: hwo
+      hwext: "true"
+      fields:
+      [
+        { bits: "31:0", desc: "Cycles from start to done" }
+      ]
+    }
+    {
+      // DEBUG-Instrumentierung: kumulativer Zyklenstand (cyc_cnt) zum Zeitpunkt
+      // layer_done der jeweiligen Schicht. Pro-Schicht-Zyklen in SW als Differenz:
+      //   conv1 = L0, conv2 = L1-L0, fc1 = L2-L1, fc2 = L3-L2, argmax = total-L3.
+      name: cycle_layer0
+      desc: "Cumulative cycles at end of CONV1. Valid when status.done = 1."
+      swaccess: ro
+      hwaccess: hwo
+      hwext: "true"
+      fields: [ { bits: "31:0", desc: "cyc_cnt @ conv1 layer_done" } ]
+    }
+    {
+      name: cycle_layer1
+      desc: "Cumulative cycles at end of CONV2. Valid when status.done = 1."
+      swaccess: ro
+      hwaccess: hwo
+      hwext: "true"
+      fields: [ { bits: "31:0", desc: "cyc_cnt @ conv2 layer_done" } ]
+    }
+    {
+      name: cycle_layer2
+      desc: "Cumulative cycles at end of FC1. Valid when status.done = 1."
+      swaccess: ro
+      hwaccess: hwo
+      hwext: "true"
+      fields: [ { bits: "31:0", desc: "cyc_cnt @ fc1 layer_done" } ]
+    }
+    {
+      name: cycle_layer3
+      desc: "Cumulative cycles at end of FC2. Valid when status.done = 1."
+      swaccess: ro
+      hwaccess: hwo
+      hwext: "true"
+      fields: [ { bits: "31:0", desc: "cyc_cnt @ fc2 layer_done" } ]
+    }
+    {
+      // STALENESS-GUARD: konstante Build-/Optimierungs-Kennung. SW liest sie nach
+      // dem Flashen; stimmt sie mit dem erwarteten Wert ueberein, wurde student_cnn
+      // (inkl. conv1-WS-Routing) FRISCH synthetisiert -> KEIN stale build. Der Wert
+      // wird bei JEDER RTL-Aenderung erhoeht (0xC1_00_00_NN, NN = Opt-Stufe):
+      //   01 = WS-conv1/conv2 Baseline + per-layer counters
+      name: version
+      desc: "Constant build/optimization tag (0xC10000NN). Read to confirm a fresh, non-stale build."
+      swaccess: ro
+      hwaccess: hwo
+      hwext: "true"
+      fields: [ { bits: "31:0", desc: "0xC10000NN, NN = optimization level" } ]
+    }
+  ]
+}

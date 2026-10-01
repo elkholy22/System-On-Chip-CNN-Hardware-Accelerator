@@ -1,0 +1,54 @@
+version = 1
+
+[[annotations]]
+# Documentation files:
+path = [
+    "README.md",
+    "docs/**/*.rst",
+    "docs/**/*.svg",
+    "docs/cell_lib/base.py",
+    "docs/design_ref/fpga_board.jpg",
+    "examples/README.md",
+    "docs/design_ref/mechanical/acrylic_board.pdf",
+    "docs/design_ref/mechanical/cable_clamp_part1.stl",
+    "docs/design_ref/mechanical/cable_clamp_part2.stl",
+    "docs/tutorials/setup/vivado_install1.png",
+    "docs/tutorials/setup/vivado_install2.png",
+    "docs/tutorials/setup/vivado_install3.png",
+    "requirements.txt",
+]
+SPDX-FileCopyrightText = "2024 RVLab contributors"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+# Files where no license header can be placed:
+path = [
+    "src/design/pincheck/pincheck.csv",
+]
+SPDX-FileCopyrightText = "2024 RVLab contributors"
+SPDX-License-Identifier = "SHL-2.1"
+
+
+[[annotations]]
+# Auto-generated files:
+path = [
+    "docs/Makefile",
+    "docs/make.bat",
+    "src/design/ip/design.txt",
+    "src/design/ip/mig_a.prj",
+    "src/design/wave/student_rlight_tb.do",
+    "src/design/wave/student_rlight_tb.xsim.wcfg",
+    "src/design/wave/system_tb.do",
+    "src/design/wave/system_tb.xsim.wcfg",
+]
+SPDX-FileCopyrightText = "NONE"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+# Boilerplate files:
+path = [
+    ".gitignore",
+    ""
+]
+SPDX-FileCopyrightText = "NONE"
+SPDX-License-Identifier = "CC0-1.0"
